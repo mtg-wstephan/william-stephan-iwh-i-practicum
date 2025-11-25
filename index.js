@@ -14,7 +14,18 @@ const PRIVATE_APP_ACCESS = process.env.PRIVATE_APP_ACCESS;
 // TODO: ROUTE 1 - Create a new app.get route for the homepage to call your custom object data. Pass this data along to the front-end and create a new pug template in the views folder.
 
 app.get('/', async (req, res) => {
-    
+    const objects = 'https://api.hubspot.com/crm/v3/objects/2-195039471?properties=name,rating,genre';
+    const headers = {
+        Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
+        'Content-Type': 'application/json'
+    }
+    try {
+        const resp = await axios.get(objects, { headers });
+        const data = resp.data.results;
+        res.render('homepage', { title: 'Home | Integrating With HubSpot I Practicum', data });
+    } catch (error) {
+        console.error(error);
+    }
 });
 
 // TODO: ROUTE 2 - Create a new app.get route for the form to create or update new custom object data. Send this data along in the next route.
@@ -33,15 +44,15 @@ app.post('/update-cobj', async (req, res) => {
             "genre": req.body.genre
         }
     }
-    const updateCobj = `https://api.hubapi.com/crm/v3/objects/`;
+    const updateCobj = `https://api.hubapi.com/crm/v3/objects/2-195039471`;
     const headers = {
         Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
         'Content-Type': 'application/json'
     };
-    try { 
-        await axios.patch(updateCobj, update, { headers } );
+    try {
+        await axios.post(updateCobj, update, { headers });
         res.redirect('back');
-    } catch(err) {
+    } catch (err) {
         console.error(err);
     }
 });
@@ -92,4 +103,4 @@ app.post('/update', async (req, res) => {
 
 
 // * Localhost
-app.listen(3000, () => console.log('Listening on http://localhost:3000'));
+app.listen(8080, () => console.log('Listening on http://localhost:8080'));
